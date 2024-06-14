@@ -1,0 +1,46 @@
+#vagrant plugin install vagrant-vbguest //synced_folder mount ayarlamak için
+#https://download.virtualbox.org/virtualbox/7.0.18/VBoxGuestAdditions_7.0.18.iso
+#Copy iso file /mnt/c/Users/Abdullah/.vagrant.d/tmp/VBoxGuestAdditions_7.0.18.iso into the box /tmp/VBoxGuestAdditions.iso
+# vagrant plugin install virtualbox_WSL2 wsl2 ile ssh hatası alındığı zaman ki çözüm
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/debian10"
+  config.vm.provision "shell", inline: <<-SHELL
+    export DEBIAN_FRONTEND=noninteractive
+    sudo apt-get update
+    sudo -E apt-get install -y postfix
+  SHELL
+  # config.vm.synced_folder "./configs", "/home/vagrant/.ssh" dosya paylaşımı için
+    config.vm.define "acetinS" do |control|
+      control.vm.hostname = "acetinS"
+      control.vm.network "private_network", ip: "192.168.56.110"
+      control.vm.provider "virtualbox" do |vb|
+        vb.name = "acetinS"
+        vb.memory = "1024"
+        vb.cpus = 1
+      end
+      control.ssh.insert_key = false
+      control.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
+      control.vm.provision "file", source: "./configs/authorized_keys", destination: "~/.ssh/authorized_keys"
+      control.vm.provision "file", source: "./configs/acetinS_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+      control.vm.provision "file", source: "./configs/acetinS_rsa", destination: "~/.ssh/id_rsa"
+      control.vm.provision "file", source: "./configs/token", destination: "~/token"
+      control.vm.provision "shell", path: "./scripts/initilaize.sh"
+    end
+    config.vm.define "acetinSW" do |control|
+      control.vm.hostname = "acetinSW"
+      control.vm.network "private_network", ip: "192.168.56.111"
+      control.vm.provider "virtualbox" do |vb|
+        vb.name = "acetinSW"
+        vb.memory = "1024"
+        vb.cpus = 1
+      end
+      control.ssh.insert_key = false
+      control.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
+      control.vm.provision "file", source: "./configs/authorized_keys", destination: "~/.ssh/authorized_keys"
+      control.vm.provision "file", source: "./configs/acetinSW_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+      control.vm.provision "file", source: "./configs/acetinSW_rsa", destination: "~/.ssh/id_rsa"
+      control.vm.provision "file", source: "./configs/token", destination: "~/token"
+      control.vm.provision "shell", path: "./scripts/initilaize.sh"
+    end
+  end
+  
