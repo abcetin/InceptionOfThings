@@ -13,7 +13,7 @@ user=""
 
 username=$(whoami)
 
-
+mkdir ../configs
 
 if [ -f ../configs/authorized_keys ]; then
     acetinS=$(cat ../configs/authorized_keys | grep -w 'acetinS')
