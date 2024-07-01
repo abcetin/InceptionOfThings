@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: app-one-ingress
+  name: my-ingress
 spec:
   rules:
   - host: app1.com
@@ -14,8 +14,6 @@ spec:
             name: app-one-service
             port:
               number: 80
-  spec:
-  rules:
   - host: app2.com
     http:
       paths:

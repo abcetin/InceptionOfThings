@@ -5,13 +5,9 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 cd "$SCRIPT_DIR"
 
-acetinS=""
-
 user=""
 
 username=$(whoami)
-
-mkdir ../configs
 
 if [ -f ../configs/authorized_keys ]; then
     user=$(cat ../configs/authorized_keys | grep -w "$username")
