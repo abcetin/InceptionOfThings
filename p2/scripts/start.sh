@@ -7,8 +7,6 @@ cd "$SCRIPT_DIR"
 
 acetinS=""
 
-acetinSW=""
-
 user=""
 
 username=$(whoami)
