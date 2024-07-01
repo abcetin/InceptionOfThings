@@ -15,7 +15,7 @@ spec:
         app: app-one
     spec:
       containers:
-      - name: nginx
+      - name: hello-world-one
         image: paulbouwer/hello-kubernetes:1.10
         ports:
         - containerPort: 80
@@ -25,11 +25,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-one-service
+  name: app-one
 spec:
   selector:
     app: app-one
-  type: NodePort
   ports:
     - protocol: TCP
       port: 80

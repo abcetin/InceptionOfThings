@@ -15,7 +15,7 @@ spec:
         app: app-three
     spec:
       containers:
-      - name: nginx
+      - name: hello-world-three
         image: paulbouwer/hello-kubernetes:1.10
         ports:
         - containerPort: 80
@@ -25,11 +25,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-three-service
+  name: app-three
 spec:
   selector:
     app: app-three
-  type: NodePort
   ports:
     - protocol: TCP
       port: 80
