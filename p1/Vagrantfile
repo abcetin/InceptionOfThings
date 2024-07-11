@@ -12,8 +12,8 @@ Vagrant.configure("2") do |config|
     echo "alias k=kubectl" >> /etc/profile.d/env.sh
     source /etc/profile.d/env.sh
   SHELL
-  config.vm.provision "file", source: "./configs/authorized_keys", destination: "~/.ssh/authorized_keys"
-  config.vm.provision "file", source: "./configs/token", destination: "~/token"
+  config.vm.provision "file", source: "./confs/authorized_keys", destination: "~/.ssh/authorized_keys"
+  config.vm.provision "file", source: "./confs/token", destination: "~/token"
     config.vm.define "acetinS" do |server|
       server.vm.hostname = "acetinS"
       server.vm.network "private_network", ip: "192.168.56.110"
@@ -24,8 +24,8 @@ Vagrant.configure("2") do |config|
       end
       server.ssh.insert_key = false
       server.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
-      server.vm.provision "file", source: "./configs/acetinS_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-      server.vm.provision "file", source: "./configs/acetinS_rsa", destination: "~/.ssh/id_rsa"
+      server.vm.provision "file", source: "./confs/acetinS_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+      server.vm.provision "file", source: "./confs/acetinS_rsa", destination: "~/.ssh/id_rsa"
       server.vm.provision "shell", path: "./scripts/initilaize.sh"
     end
     config.vm.define "acetinSW" do |serverWorker|
@@ -38,8 +38,8 @@ Vagrant.configure("2") do |config|
       end
       serverWorker.ssh.insert_key = false
       serverWorker.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
-      serverWorker.vm.provision "file", source: "./configs/acetinSW_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-      serverWorker.vm.provision "file", source: "./configs/acetinSW_rsa", destination: "~/.ssh/id_rsa"
+      serverWorker.vm.provision "file", source: "./confs/acetinSW_rsa.pub", destination: "~/.ssh/id_rsa.pub"
+      serverWorker.vm.provision "file", source: "./confs/acetinSW_rsa", destination: "~/.ssh/id_rsa"
       serverWorker.vm.provision "shell", path: "./scripts/initilaize.sh"
     end
   end

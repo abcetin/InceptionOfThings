@@ -29,4 +29,4 @@ sudo usermod -aG docker $USER
 
 newgrp docker << e
 ./kube.sh
-# e
+e

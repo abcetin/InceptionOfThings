@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+cd "$SCRIPT_DIR"
+
 sudo mkdir /etc/docker
 sudo echo "{\"dns\": [\"8.8.8.8\", \"8.8.4.4\"]}" > daemon.json
 sudo cp daemon.json /etc/docker/
@@ -19,4 +22,6 @@ sudo apt-get update
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 sudo usermod -aG docker $USER
-# newgrp docker
+newgrp docker << e
+./init.sh
+e

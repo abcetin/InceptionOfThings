@@ -8,9 +8,9 @@ sudo apt-get install sshpass
 
 # echo "export PATH=$PATH:/usr/sbin" >> home/vagrant/.bashrc
 # source home/vagrant/.bashrc
-TOKEN=$(cat /home/vagrant/token)
+# TOKEN=$(cat /home/vagrant/token)
 
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san 192.168.56.110 --node-ip 192.168.56.110" K3S_TOKEN="$TOKEN" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san 192.168.56.110 --node-ip 192.168.56.110" sh -
 
 
 # Add Docker's official GPG key:

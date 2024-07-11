@@ -77,13 +77,13 @@ helm install gitlab gitlab/gitlab \
     --set certmanager-issuer.email="cetin.ab@outlook.com" \
     --set global.hosts.domain=acetin.com \
     --set global.hosts.https=false \
-    --set global.certificates.customCAs[0].secret=gitlab-internal-tls-ca \
-    --set global.workhorse.tls.enabled=true \
-    --set gitlab.webservice.tls.secretName=gitlab-internal-tls \
-    --set gitlab.webservice.workhorse.tls.verify=true \
-    --set gitlab.webservice.workhorse.tls.secretName=gitlab-internal-tls \
-    --set gitlab.webservice.workhorse.tls.caSecretName=gitlab-internal-tls-ca \
     -n gitlab --create-namespace 
+# --set global.certificates.customCAs[0].secret=gitlab-internal-tls-ca \
+    # --set global.workhorse.tls.enabled=true \
+    # --set gitlab.webservice.tls.secretName=gitlab-internal-tls \
+    # --set gitlab.webservice.workhorse.tls.verify=true \
+    # --set gitlab.webservice.workhorse.tls.secretName=gitlab-internal-tls \
+    # --set gitlab.webservice.workhorse.tls.caSecretName=gitlab-internal-tls-ca \
 echo  -e "${BLUE}--------------------- gitlab kurulumu tamamlandı ---------------------${BLUE}"
 
 
@@ -122,6 +122,7 @@ git add .
 git commit -m "bonus"
 git push --set-upstream https://root:$token@gitlab.acetin.com/root/InceptionOfThings.git master
 
+# coredns 
 kubectl patch -n kube-system configmap coredns -p "$(cat confs/coredns.yaml)"
 coredns=$(kubectl get pod -n kube-system | grep coredns | awk '{print $1}')
 kubectl delete pod -n kube-system $coredns

@@ -7,7 +7,6 @@ Vagrant.configure("2") do |config|
     echo "export PATH=\"$PATH:/usr/sbin\"" >> /etc/profile.d/env.sh
     echo "alias k=kubectl" >> /etc/profile.d/env.sh
     source /etc/profile.d/env.sh
-    alias k=kubectl
   SHELL
     config.vm.define "acetinS" do |server|
       server.vm.hostname = "acetinS"
@@ -19,11 +18,11 @@ Vagrant.configure("2") do |config|
       end
       server.ssh.insert_key = false
       server.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
-      server.vm.provision "file", source: "./configs/authorized_keys", destination: "~/.ssh/authorized_keys"
-      server.vm.provision "file", source: "./configs/app1.yaml", destination: "~/p2/app1.yaml"
-      server.vm.provision "file", source: "./configs/app2.yaml", destination: "~/p2/app2.yaml"
-      server.vm.provision "file", source: "./configs/app3.yaml", destination: "~/p2/app3.yaml"
-      server.vm.provision "file", source: "./configs/ingress.yaml", destination: "~/p2/ingress.yaml"
+      server.vm.provision "file", source: "./confs/authorized_keys", destination: "~/.ssh/authorized_keys"
+      server.vm.provision "file", source: "./confs/app1.yaml", destination: "~/p2/app1.yaml"
+      server.vm.provision "file", source: "./confs/app2.yaml", destination: "~/p2/app2.yaml"
+      server.vm.provision "file", source: "./confs/app3.yaml", destination: "~/p2/app3.yaml"
+      server.vm.provision "file", source: "./confs/ingress.yaml", destination: "~/p2/ingress.yaml"
       server.vm.provision "shell", path: "./scripts/initilaize.sh"
     end
 end
