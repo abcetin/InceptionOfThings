@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://gitlab.acetin.com/root/InceptionOfThings.git
-    targetRevision: master
+    targetRevision: HEAD
     path: confs/playground
   destination:
     server: https://kubernetes.default.svc

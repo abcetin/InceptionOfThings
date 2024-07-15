@@ -36,4 +36,8 @@ kubectl create secret generic p3-secret \
     --from-file=sshPrivateKey=/home/$USERNAME/.ssh/id_rsa \
     -n argocd
 kubectl label secret p3-secret argocd.argoproj.io/secret-type=repo-creds -n argocd
-newgrp docker
+
+argo_passwd=$(kubectl get secret -n argocd argocd-initial-admin-secret -ojsonpath='{.data.password}' | base64 --decode)
+kubectl port-forward -n argocd svc/argocd-server 8081:443 > /dev/null 2>&1 &
+echo -e "Argocd: http://127.0.0.1:$argocd"
+echo -e "Argocd Password: $argo_passwd "

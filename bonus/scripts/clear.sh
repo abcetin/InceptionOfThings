@@ -26,3 +26,4 @@ sudo rm -rf /etc/docker
 sudo rm -rf /usr/local/bin/argocd
 sudo apt-get clean
 sudo apt-get update
+rm -rf .git

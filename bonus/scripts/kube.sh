@@ -89,13 +89,13 @@ echo  -e "${BLUE}--------------------- gitlab kurulumu tamamlandı -------------
 
 toolbox=$(kubectl get pod -n gitlab | grep toolbox | awk '{print $1}')
 
-webservice=$(kubectl get pod -n gitlab | grep webservice | awk 'NR==1 {print $1}')
-
+webservice1=$(kubectl get pod -n gitlab | grep webservice | awk 'NR==1 {print $1}')
+webservice2=$(kubectl get pod -n gitlab | grep webservice | awk 'NR==2 {print $1}')
 
 echo  -e "${BLUE}toolbox başlatılması bekleniyor... ${BLUE}"
 kubectl wait -n gitlab --for=condition=Ready pod/$toolbox --timeout=660s
-echo  -e "${BLUE}webservice kurulumu bekleniyor ${BLUE}"
-kubectl wait -n gitlab --for=condition=Ready pod/$webservice --timeout=660s
+echo  -e "${BLUE}webservice1 & webservice2 kurulumu bekleniyor ${BLUE}"
+kubectl wait -n gitlab --for=condition=Ready pod/$webservice1 --for=condition=Ready pod/$webservice2 --timeout=660s
 
 willService=$(kubectl get svc -n dev | grep will | awk '{print $1}')
 
@@ -118,9 +118,11 @@ if [ ! -f ../.git ]; then
 fi
 
 git config --global http.sslVerify false
+git init
+git remote add origin https://root:$token@gitlab.acetin.com/root/InceptionOfThings.git
 git add .
 git commit -m "bonus"
-git push --set-upstream https://root:$token@gitlab.acetin.com/root/InceptionOfThings.git master
+git push --set-upstream origin master
 
 # coredns 
 kubectl patch -n kube-system configmap coredns -p "$(cat confs/coredns.yaml)"
@@ -138,7 +140,11 @@ echo  -e "${BLUE}will Playgorund: http://127.0.0.1:$will ${BLUE}"
 echo  -e "${BLUE}Gitlab: https://gitlab.acetin.com ${BLUE}"
 
 argocd login --insecure --username admin --password $argo_passwd 127.0.0.1:$argocd
-argocd repo add --insecure-skip-server-verification https://gitlab.acetin.com/root/InceptionOfThings.git
+if argocd repo add --insecure-skip-server-verification https://gitlab.acetin.com/root/InceptionOfThings.git; then
+    echo "GitLab reposu başarıyla Argo CD'ye eklendi."
+else
+    kubectl delete pod -n gitlab $webservice1 $webservice2
+fi
 
 echo  -e "${BLUE}Gitlab Password: $git_passwd ${BLUE}"
 echo  -e "${BLUE}Argocd Password: $argo_passwd ${BLUE}"
