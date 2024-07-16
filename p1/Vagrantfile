@@ -3,7 +3,7 @@
 #Copy iso file /mnt/c/Users/Abdullah/.vagrant.d/tmp/VBoxGuestAdditions_7.0.18.iso into the box /tmp/VBoxGuestAdditions.iso
 # vagrant plugin install virtualbox_WSL2 wsl2 ile ssh hatası alındığı zaman ki çözüm
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/debian11"
+  config.vm.box = "debian/bullseye64"
   config.vm.provision "shell", inline: <<-SHELL
     export DEBIAN_FRONTEND=noninteractive #debain kurulumu sırasında kullanıcıdan her hangi bir girdi almaması için
     sudo apt-get update
