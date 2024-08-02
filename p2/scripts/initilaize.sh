@@ -1,16 +1,14 @@
 #!/bin/bash
 
-HOSTNAME=$(hostname)
+SCRIPT_DIR=$(dirname "$(realpath "$0")")
+cd "$SCRIPT_DIR"
+
+vagrant up
 
 sudo apt-get update
 sudo apt-get upgrade -y
-sudo apt-get install sshpass
 
-# echo "export PATH=$PATH:/usr/sbin" >> home/vagrant/.bashrc
-# source home/vagrant/.bashrc
-# TOKEN=$(cat /home/vagrant/token)
-
-curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san 192.168.56.110 --node-ip 192.168.56.110" sh -
+curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="--write-kubeconfig-mode=644 --tls-san 192.168.56.110 --node-ip 192.168.56.110 --snapshotter=fuse-overlayfs" sh -
 
 
 # Add Docker's official GPG key:
@@ -29,8 +27,9 @@ sudo apt-get update
 
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
-sudo usermod -aG docker $USER
+sudo usermod -aG docker vagrant
 newgrp docker
+sudo systemctl start docker
 
-cd p2/
+cd /p2
 kubectl apply -f .

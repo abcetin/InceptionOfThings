@@ -1,46 +1,43 @@
 #vagrant plugin install vagrant-vbguest //synced_folder mount ayarlamak için
-#https://download.virtualbox.org/virtualbox/7.0.18/VBoxGuestAdditions_7.0.18.iso
-#Copy iso file /mnt/c/Users/Abdullah/.vagrant.d/tmp/VBoxGuestAdditions_7.0.18.iso into the box /tmp/VBoxGuestAdditions.iso
 # vagrant plugin install virtualbox_WSL2 wsl2 ile ssh hatası alındığı zaman ki çözüm
+
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/bullseye64"
-  config.vm.provision "shell", inline: <<-SHELL
-    export DEBIAN_FRONTEND=noninteractive #debain kurulumu sırasında kullanıcıdan her hangi bir girdi almaması için
-    sudo apt-get update
-    sudo -E apt-get install -y postfix
-    echo "export PATH=\"$PATH:/usr/sbin\"" >> /etc/profile.d/env.sh
-    echo "alias k=kubectl" >> /etc/profile.d/env.sh
-    source /etc/profile.d/env.sh
-  SHELL
-  config.vm.provision "file", source: "./confs/authorized_keys", destination: "~/.ssh/authorized_keys"
-  config.vm.provision "file", source: "./confs/token", destination: "~/token"
     config.vm.define "acetinS" do |server|
+      server.vm.network :private_network, ip: "192.168.56.110", name:"iot"
       server.vm.hostname = "acetinS"
-      server.vm.network "private_network", ip: "192.168.56.110"
-      server.vm.provider "virtualbox" do |vb|
-        vb.name = "acetinS"
-        vb.memory = "1024"
-        vb.cpus = 1
+      server.vm.provider "docker" do |docker|
+        docker.privileged = true
+        docker.build_dir = "."
+        docker.dockerfile = "confs/Dockerfile"
+        docker.name = "acetinS"
+        docker.has_ssh = true
+        docker.remains_running = true
+        docker.create_args = ["--cpus=1", "--memory=1024m"]
       end
-      server.ssh.insert_key = false
-      server.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
-      server.vm.provision "file", source: "./confs/acetinS_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-      server.vm.provision "file", source: "./confs/acetinS_rsa", destination: "~/.ssh/id_rsa"
-      server.vm.provision "shell", path: "./scripts/initilaize.sh"
+      server.vm.provision "shell", path:"./scripts/initilaize.sh"
     end
     config.vm.define "acetinSW" do |serverWorker|
       serverWorker.vm.hostname = "acetinSW"
-      serverWorker.vm.network "private_network", ip: "192.168.56.111"
-      serverWorker.vm.provider "virtualbox" do |vb|
-        vb.name = "acetinSW"
-        vb.memory = "1024"
-        vb.cpus = 1
+      serverWorker.vm.network :private_network, ip: "192.168.56.111", name:"iot"
+      serverWorker.vm.provider "docker" do |docker|
+        docker.privileged = true
+        docker.build_dir = "."
+        docker.dockerfile = "confs/Dockerfile"
+        docker.name = "acetinSW"
+        docker.has_ssh = true
+        docker.remains_running = true
+        docker.create_args = ["--cpus=1", "--memory=1024m"]
       end
-      serverWorker.ssh.insert_key = false
-      serverWorker.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
-      serverWorker.vm.provision "file", source: "./confs/acetinSW_rsa.pub", destination: "~/.ssh/id_rsa.pub"
-      serverWorker.vm.provision "file", source: "./confs/acetinSW_rsa", destination: "~/.ssh/id_rsa"
-      serverWorker.vm.provision "shell", path: "./scripts/initilaize.sh"
+      serverWorker.vm.provision "shell", path:"./scripts/initilaize.sh"
     end
   end
-  
+ 
+### docker subnet ayarlama 
+# cat /etc/docker/daemon.json 
+# {
+#     "bip": "192.168.56.1/16"
+# }
+#echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf
+# docker inspect <container_id_or_name> --format='{{.HostConfig.NanoCpus}}'
+# docker inspect <container_id_or_name> --format='{{.HostConfig.Memory}}' | awk '{print $1/1024/1024 " MB"}'
+

@@ -1,28 +1,16 @@
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/bullseye64"
-  config.vm.provision "shell", inline: <<-SHELL
-    export DEBIAN_FRONTEND=noninteractive
-    sudo apt-get update
-    sudo -E apt-get install -y postfix
-    echo "export PATH=\"$PATH:/usr/sbin\"" >> /etc/profile.d/env.sh
-    echo "alias k=kubectl" >> /etc/profile.d/env.sh
-    source /etc/profile.d/env.sh
-  SHELL
     config.vm.define "acetinS" do |server|
+      server.vm.network :private_network, ip: "192.168.56.110", name:"iot"
       server.vm.hostname = "acetinS"
-      server.vm.network "private_network", ip: "192.168.56.110"
-      server.vm.provider "virtualbox" do |vb|
-        vb.name = "acetinS"
-        vb.memory = "1024"
-        vb.cpus = 1
+      server.vm.provider "docker" do |docker|
+        docker.privileged = true
+        docker.build_dir = "."
+        docker.dockerfile = "confs/Dockerfile"
+        docker.name = "acetinS"
+        docker.has_ssh = true
+        docker.remains_running = true
+        # docker.create_args = ["--cpus=1", "--memory=1024m"]
       end
-      server.ssh.insert_key = false
-      server.ssh.private_key_path = ['~/.vagrant.d/insecure_private_key', '~/.ssh/id_rsa']
-      server.vm.provision "file", source: "./confs/authorized_keys", destination: "~/.ssh/authorized_keys"
-      server.vm.provision "file", source: "./confs/app1.yaml", destination: "~/p2/app1.yaml"
-      server.vm.provision "file", source: "./confs/app2.yaml", destination: "~/p2/app2.yaml"
-      server.vm.provision "file", source: "./confs/app3.yaml", destination: "~/p2/app3.yaml"
-      server.vm.provision "file", source: "./confs/ingress.yaml", destination: "~/p2/ingress.yaml"
       server.vm.provision "shell", path: "./scripts/initilaize.sh"
     end
 end

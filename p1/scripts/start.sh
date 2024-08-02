@@ -20,8 +20,6 @@ user=""
 
 username=$(whoami)
 
-mkdir ../confs
-
 if [ -f ../confs/authorized_keys ]; then
     acetinS=$(cat ../confs/authorized_keys | grep -w 'acetinS')
     acetinSW=$(cat ../confs/authorized_keys | grep -w "acetinSW")
