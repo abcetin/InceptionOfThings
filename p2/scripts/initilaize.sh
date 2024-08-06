@@ -1,9 +1,9 @@
 #!/bin/bash
 
-SCRIPT_DIR=$(dirname "$(realpath "$0")")
-cd "$SCRIPT_DIR"
+#SCRIPT_DIR=$(dirname "$(realpath "$0")")
+#cd "$SCRIPT_DIR"
 
-vagrant up
+#vagrant up
 
 sudo apt-get update
 sudo apt-get upgrade -y
