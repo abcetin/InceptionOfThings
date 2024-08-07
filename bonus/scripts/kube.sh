@@ -114,12 +114,12 @@ kubectl exec -it -n gitlab $toolbox -- /bin/bash -c '/tmp/create-access-token.sh
 
 curl -k --header "Private-Token: $token" --data "name=InceptionOfThings&visibility=public" "https://gitlab.acetin.com/api/v4/projects"
 
+git config --global user.email "cetin.ab@outlook.com"
+git config --global user.name "abcetin"
+git config --global http.sslVerify false
 if [ ! -f ../.git ]; then
     git init
 fi
-
-git config --global http.sslVerify false
-git init
 git remote add origin https://root:$token@gitlab.acetin.com/root/InceptionOfThings.git
 git add .
 git commit -m "bonus"
