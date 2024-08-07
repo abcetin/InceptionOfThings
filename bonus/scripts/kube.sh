@@ -31,13 +31,13 @@ echo  -e "${BLUE}--------------------- k3d kurulumu başladı ------------------
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
 
-IP=`ifconfig eth0 | grep inet | grep -v inet6 | awk '{print $2}'`
-echo $IP
+#IP=`ifconfig eth0 | grep inet | grep -v inet6 | awk '{print $2}'`
+#echo $IP
 # k3d cluster create bonus --api-port 127.0.0.1:6543
-k3d cluster create bonus --wait --k3s-arg '--disable=traefik@server:*' --api-port $IP:6550 -p "$IP:443:443@loadbalancer" -a 5 #-p "$IP:23:22@loadbalancer" -p "$IP:80:80@LoadBalancer"
-server=$(sudo docker ps -a | grep rancher | awk '{print $1}')
-sudo docker exec -it $server sh -c "echo \"nameserver 8.8.8.8\" >> /etc/resolv.conf"
-sudo docker exec -it $server sh -c "echo \"nameserver 8.8.4.4\" >> /etc/resolv.conf"
+k3d cluster create bonus --wait --k3s-arg '--disable=traefik@server:*' --api-port 6550 -p "443:443@loadbalancer" -a 5 #-p "$IP:23:22@loadbalancer" -p "$IP:80:80@LoadBalancer"
+# server=$(sudo docker ps -a | grep rancher | awk '{print $1}')
+# sudo docker exec -it $server sh -c "echo \"nameserver 8.8.8.8\" >> /etc/resolv.conf"
+# sudo docker exec -it $server sh -c "echo \"nameserver 8.8.4.4\" >> /etc/resolv.conf"
 echo  -e "${BLUE}--------------------- k3d kurulumu tamamlandı ---------------------${BLUE}"
 
 
