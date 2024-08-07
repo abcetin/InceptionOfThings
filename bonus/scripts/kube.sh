@@ -5,9 +5,6 @@ gitlab=8181
 will=8080
 argocd=8081
 token=glpat-q1tdxDFFNz_NZ9MtyJxz
-# sudo ip link add name eth1 type dummy #dummy sanal bir sanal ağ arayüzü
-# sudo ip addr add 192.168.56.110/24 dev eth1
-# sudo ip link set eth1 up
 
 echo  -e "${BLUE}--------------------- kubectl kurulumu başladı ---------------------${BLUE}"
 curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -31,13 +28,8 @@ echo  -e "${BLUE}--------------------- k3d kurulumu başladı ------------------
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
 
-#IP=`ifconfig eth0 | grep inet | grep -v inet6 | awk '{print $2}'`
-#echo $IP
-# k3d cluster create bonus --api-port 127.0.0.1:6543
 k3d cluster create bonus --wait --k3s-arg '--disable=traefik@server:*' --api-port 6550 -p "443:443@loadbalancer" -a 5 #-p "$IP:23:22@loadbalancer" -p "$IP:80:80@LoadBalancer"
-# server=$(sudo docker ps -a | grep rancher | awk '{print $1}')
-# sudo docker exec -it $server sh -c "echo \"nameserver 8.8.8.8\" >> /etc/resolv.conf"
-# sudo docker exec -it $server sh -c "echo \"nameserver 8.8.4.4\" >> /etc/resolv.conf"
+
 echo  -e "${BLUE}--------------------- k3d kurulumu tamamlandı ---------------------${BLUE}"
 
 
@@ -45,14 +37,7 @@ kubectl create namespace gitlab
 kubectl create namespace dev
 kubectl create namespace argocd
 
-# export NAMESPACE=gitlab
-# export RELEASE=gitlab
-# ./tls.sh
-
-
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-
-cd ..
 
 echo  -e "${BLUE}--------------------- argocd cli kurulumu başladı ---------------------${BLUE}"
 curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
@@ -60,14 +45,6 @@ sudo install -m 555 argocd-linux-amd64 /usr/local/bin/argocd
 rm argocd-linux-amd64
 echo  -e "${BLUE}--------------------- argocd cli kurulumu tamamlandı ---------------------${BLUE}"
 USERNAME=$(whoami)
-
-# kubectl create secret generic bonus-secret \
-#     --from-literal=type=git \
-#     --from-literal=url=git@gitlab.acetin.com:root/InceptionOfThings.git \
-#     --from-file=sshPrivateKey=/home/$USERNAME/.ssh/id_rsa \
-#     -n argocd
-# kubectl label secret bonus-secret argocd.argoproj.io/secret-type=repo-creds -n argocd
-
 
 domain=$(hostname)
 echo  -e "${BLUE}--------------------- gitlab kurulumu başladı ---------------------${BLUE}"
@@ -79,12 +56,6 @@ helm install gitlab gitlab/gitlab \
     --set global.hosts.gitlab.name=$domain \
     -f confs/values.yaml \
     -n gitlab --create-namespace 
-# --set global.certificates.customCAs[0].secret=gitlab-internal-tls-ca \
-    # --set global.workhorse.tls.enabled=true \
-    # --set gitlab.webservice.tls.secretName=gitlab-internal-tls \
-    # --set gitlab.webservice.workhorse.tls.verify=true \
-    # --set gitlab.webservice.workhorse.tls.secretName=gitlab-internal-tls \
-    # --set gitlab.webservice.workhorse.tls.caSecretName=gitlab-internal-tls-ca \
 echo  -e "${BLUE}--------------------- gitlab kurulumu tamamlandı ---------------------${BLUE}"
 
 
@@ -125,11 +96,6 @@ git add .
 git commit -m "bonus"
 git push --set-upstream origin master
 
-# coredns 
-# kubectl patch -n kube-system configmap coredns -p "$(cat confs/coredns.yaml)"
-# coredns=$(kubectl get pod -n kube-system | grep coredns | awk '{print $1}')
-# kubectl delete pod -n kube-system $coredns
-
 git_passwd=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)
 argo_passwd=$(kubectl get secret -n argocd argocd-initial-admin-secret -ojsonpath='{.data.password}' | base64 --decode)
 
@@ -149,8 +115,3 @@ fi
 
 echo  -e "${BLUE}Gitlab Password: $git_passwd ${BLUE}"
 echo  -e "${BLUE}Argocd Password: $argo_passwd ${BLUE}"
-
-
-# kubectl patch -n argocd svc/argocd-server -p '{"spec": {"type": "ClusterIP"}}'
-#### configmap te ip yi düzenlemeyi unutma
-## ssh-keyscan gitlab.acetin.com | argocd cert add-ssh --batch
