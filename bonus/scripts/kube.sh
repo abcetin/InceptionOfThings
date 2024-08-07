@@ -34,7 +34,7 @@ wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 IP=`ifconfig eth0 | grep inet | grep -v inet6 | awk '{print $2}'`
 echo $IP
 # k3d cluster create bonus --api-port 127.0.0.1:6543
-k3d cluster create bonus --wait --k3s-arg '--disable=traefik@server:*' --api-port $IP:6550 -p "$IP:443:443@loadbalancer" #-p "$IP:23:22@loadbalancer" -p "$IP:80:80@LoadBalancer"
+k3d cluster create bonus --wait --k3s-arg '--disable=traefik@server:*' --api-port $IP:6550 -p "$IP:443:443@loadbalancer" -a 5 #-p "$IP:23:22@loadbalancer" -p "$IP:80:80@LoadBalancer"
 server=$(sudo docker ps -a | grep rancher | awk '{print $1}')
 sudo docker exec -it $server sh -c "echo \"nameserver 8.8.8.8\" >> /etc/resolv.conf"
 sudo docker exec -it $server sh -c "echo \"nameserver 8.8.4.4\" >> /etc/resolv.conf"
@@ -69,14 +69,15 @@ USERNAME=$(whoami)
 # kubectl label secret bonus-secret argocd.argoproj.io/secret-type=repo-creds -n argocd
 
 
-
+domain=$(hostname)
 echo  -e "${BLUE}--------------------- gitlab kurulumu başladı ---------------------${BLUE}"
 helm repo add gitlab https://charts.gitlab.io/
 helm repo update
 helm install gitlab gitlab/gitlab \
     --set certmanager-issuer.email="cetin.ab@outlook.com" \
-    --set global.hosts.domain=acetin.com \
     --set global.hosts.https=false \
+    --set global.hosts.gitlab.name=$domain \
+    -f confs/values.yaml \
     -n gitlab --create-namespace 
 # --set global.certificates.customCAs[0].secret=gitlab-internal-tls-ca \
     # --set global.workhorse.tls.enabled=true \
@@ -125,9 +126,9 @@ git commit -m "bonus"
 git push --set-upstream origin master
 
 # coredns 
-kubectl patch -n kube-system configmap coredns -p "$(cat confs/coredns.yaml)"
-coredns=$(kubectl get pod -n kube-system | grep coredns | awk '{print $1}')
-kubectl delete pod -n kube-system $coredns
+# kubectl patch -n kube-system configmap coredns -p "$(cat confs/coredns.yaml)"
+# coredns=$(kubectl get pod -n kube-system | grep coredns | awk '{print $1}')
+# kubectl delete pod -n kube-system $coredns
 
 git_passwd=$(kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -ojsonpath='{.data.password}' | base64 --decode)
 argo_passwd=$(kubectl get secret -n argocd argocd-initial-admin-secret -ojsonpath='{.data.password}' | base64 --decode)
