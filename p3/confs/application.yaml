@@ -6,9 +6,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: git@github.com:abcetin/acetin.git
+    repoURL: https://github.com/abcetin/acetin.git
     targetRevision: HEAD
-    path: p3/confs/playground
+    path: "."
   destination:
     server: https://kubernetes.default.svc
     namespace: dev

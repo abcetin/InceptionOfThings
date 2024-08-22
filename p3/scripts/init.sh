@@ -15,11 +15,9 @@ mv ./kubectl ~/.local/bin/kubectl
 alias k=kubectl
 
 wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
-
-k3d cluster create p3 
+IP=$(ip addr show enp0s3 | grep 'inet ' | awk '{print $2}' | cut -d'/' -f1)
+k3d cluster create p3 --k3s-arg '--disable=traefik@server:*' --api-port $IP:6550
 server=$(sudo docker ps -a | grep rancher | awk '{print $1}')
-sudo docker exec -it $server sh -c "echo \"nameserver 8.8.8.8\" >> /etc/resolv.conf"
-sudo docker exec -it $server sh -c "echo \"nameserver 8.8.4.4\" >> /etc/resolv.conf"
 
 kubectl create namespace dev
 kubectl create namespace argocd
@@ -47,11 +45,12 @@ kubectl label secret p3-secret argocd.argoproj.io/secret-type=repo-creds -n argo
 
 argo_passwd=$(kubectl get secret -n argocd argocd-initial-admin-secret -ojsonpath='{.data.password}' | base64 --decode)
 
-kubectl port-forward -n argocd --address 0.0.0.0 svc/argocd-server 8081:443 > /dev/null 2>&1 &
-kubectl port-forward -n dev --address 0.0.0.0 svc/wil-playground 8080:8888 > /dev/null 2>&1 &
-#argocd login --insecure --username admin --password $argo_passwd 127.0.0.1:8081
+kubectl port-forward -n argocd --address 127.0.0.1 svc/argocd-server 8081:443 > /dev/null 2>&1 &
+kubectl port-forward -n dev --address 127.0.0.1 svc/wil-playground 8080:8888 > /dev/null 2>&1 &
 
-argocd login --insecure --username admin --password $argo_passwd 0.0.0.0:8081
+sleep 10
+argocd login --insecure --username "admin" --password $argo_passwd 127.0.0.1:8081
+argocd repo add --insecure-skip-server-verification https://github.com/abcetin/acetin.git
 echo -e "Argocd: http://127.0.0.1:8081"
 echo -e "Will: http://127.0.0.1:8080"
 echo -e "Argocd Password: $argo_passwd "
